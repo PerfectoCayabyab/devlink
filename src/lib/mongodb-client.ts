@@ -4,18 +4,25 @@ const uri = process.env.MONGODB_URI!;
 const options = {};
 
 let client: MongoClient;
-let clientPromise: Promise<MongoClient>; // ✅ Add type here
+let clientPromise: Promise<MongoClient>;
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Please add your Mongo URI to .env.local');
 }
 
+// Extend globalThis with the proper type (linked to d.ts)
+/* eslint-disable no-var */
+declare global {
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
+/* eslint-enable no-var */
+
 if (process.env.NODE_ENV === 'development') {
-  if (!(global as any)._mongoClientPromise) {
+  if (!global._mongoClientPromise) {
     client = new MongoClient(uri, options);
-    (global as any)._mongoClientPromise = client.connect();
+    global._mongoClientPromise = client.connect();
   }
-  clientPromise = (global as any)._mongoClientPromise;
+  clientPromise = global._mongoClientPromise;
 } else {
   client = new MongoClient(uri, options);
   clientPromise = client.connect();

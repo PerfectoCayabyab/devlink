@@ -4,6 +4,7 @@ import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import clientPromise from './mongodb-client';
 import { connectToDatabase } from './mongodb';
 import { User } from '@/models/User';
+import type { DefaultUser } from 'next-auth';
 
 function sanitizeUsername(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9\-]/g, '');
@@ -36,7 +37,8 @@ export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async signIn({ user }: { user: any }) {
+    async signIn({ user }: { user: DefaultUser }) {
+
       await connectToDatabase();
 
       const existing = await User.findOne({ email: user.email });

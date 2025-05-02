@@ -1,10 +1,8 @@
-// app/[username]/page.tsx
-
 import { connectToDatabase } from "@/lib/mongodb";
 import { User } from "@/models/User";
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Shell from '@/components/Shell';
+import Shell from "@/components/Shell";
+import type { Metadata } from "next";
 import {
   Github,
   Linkedin,
@@ -12,8 +10,7 @@ import {
   Globe,
   Link as LinkIcon,
 } from "lucide-react";
-
-type Params = { username: string };
+import Image from "next/image";
 
 type LinkType = {
   id: string;
@@ -35,19 +32,25 @@ async function getUserByUsername(username: string): Promise<UserType | null> {
   return raw ? (raw as unknown as UserType) : null;
 }
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata(
+  props: Promise<{ params: { username: string } }>
+): Promise<Metadata> {
+  const { params } = await props;
   const user = await getUserByUsername(params.username);
-  if (!user) return { title: 'User not found - DevLink' };
+
+  if (!user) {
+    return { title: "User not found - DevLink" };
+  }
 
   return {
     title: `${user.name} | DevLink`,
-    description: user.bio || 'Developer profile',
+    description: user.bio || "Developer profile",
     openGraph: {
       title: `${user.name} | DevLink`,
-      description: user.bio || 'Developer profile',
+      description: user.bio || "Developer profile",
       images: [
         {
-          url: user.image || '/default-og.png',
+          url: user.image || "/default-og.png",
           width: 1200,
           height: 630,
         },
@@ -56,7 +59,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function ProfilePage({ params }: { params: Params }) {
+export default async function ProfilePage(
+  props: Promise<{ params: { username: string } }>
+) {
+  const { params } = await props;
   const user = await getUserByUsername(params.username);
   if (!user) return notFound();
 
@@ -71,10 +77,12 @@ export default async function ProfilePage({ params }: { params: Params }) {
   return (
     <Shell>
       <main className="min-h-screen px-6 py-10 max-w-2xl mx-auto text-center">
-        <img
+        <Image
+          height={112}
+          width={112}
           src={user.image || "/default-avatar.png"}
           alt={user.name}
-          className="w-28 h-28 rounded-full mx-auto border-4 border-blue-500 shadow-md"
+          className="rounded-full mx-auto border-4 border-blue-500 shadow-md"
         />
         <h1 className="text-3xl font-bold mt-4 text-gray-900 dark:text-white">
           {user.name}

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -27,7 +28,9 @@ export default function HomePage() {
 
       {session ? (
         <>
-          <img
+          <Image
+          height={80}
+          width={80}
             src={session.user?.image ?? '/default-avatar.png'}
             alt="avatar"
             className="w-20 h-20 rounded-full mx-auto border-2 border-blue-500 shadow mb-2"

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import LinkEditor from '@/components/LinkEditor';
+import Image from 'next/image';
 import SortableItem from '@/components/SortableItem';
 import Shell from '@/components/Shell';
 import { nanoid } from 'nanoid';
@@ -13,6 +14,7 @@ import {
   useSensor,
   useSensors,
   KeyboardSensor,
+  DragEndEvent 
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -45,7 +47,8 @@ export default function DashboardPage() {
       const data = await res.json();
       setBio(data.bio || '');
       setUsername(data.username || '');
-      const linksWithIds = (data.links || []).map((link: any) => ({
+      const linksWithIds = (data.links || []).map((link: Partial<Link>) => ({
+
         id: link.id ?? nanoid(),
         title: link.title,
         url: link.url,
@@ -72,7 +75,7 @@ export default function DashboardPage() {
     setLinks(links.filter((_, i) => i !== index));
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIndex = links.findIndex((l) => l.id === active.id);
@@ -117,7 +120,9 @@ export default function DashboardPage() {
     <Shell>
     <main className="max-w-2xl mx-auto px-4 py-10">
       <div className="text-center mb-8">
-        <img
+        <Image
+          width={80}
+          height={80}
           src={session.user?.image ?? '/default-avatar.png'}
           alt="avatar"
           className="w-20 h-20 rounded-full mx-auto border shadow"
